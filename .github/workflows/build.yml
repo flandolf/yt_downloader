@@ -1,0 +1,51 @@
+name: Build Flutter APK and Create GitHub Release
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "lib/**"
+      - "assets/**"
+      - "pubspec.yaml"
+      - ".github/workflows/build.yml"
+jobs:
+  build:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Flutter SDK
+        uses: subosito/flutter-action@v2
+
+      - name: Generate Version
+        id: version
+        run: |
+          for /f %%a in ('git rev-list --count HEAD') do set VERSION=%%a
+          echo Generating version %VERSION%
+          echo VERSION=%VERSION% >> $env:GITHUB_ENV
+      - name: Build Exe
+        run: flutter build windows
+
+      - name: ZIP output
+        run: Compress-Archive -Path .\build\windows\x64\runner\Release\* -DestinationPath .\release.zip
+
+      - name: Upload EXE
+        uses: actions/upload-artifact@v4
+        with:
+          name: release.zip
+          path: release.zip
+
+      - name: Create Release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: release.zip
+          token: ${{ github.token }}
+          tag: v${{ steps.version.outputs.VERSION }}
+          makeLatest: true
+          replacesArtifacts: true
+          generateReleaseNotes: true
