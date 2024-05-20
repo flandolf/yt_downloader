@@ -1,7 +1,7 @@
 # YouTube Downloader 📺
 
 ## Description
-![GitHub](https://img.shields.io/github/license/flandolf/youtube_downloader)   
+![GitHub](https://img.shields.io/github/license/flandolf/yt_downloader)   
 A flutter app that downloads YouTube videos and audios.
 
 ## Features
