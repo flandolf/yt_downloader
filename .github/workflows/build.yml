@@ -22,17 +22,17 @@ jobs:
       - name: Set up Flutter SDK
         uses: subosito/flutter-action@v2
 
-      - name: Generate Version
+      - name: Generate Version from commit number
         id: version
         run: |
-          for /f %%a in ('git rev-list --count HEAD') do set VERSION=%%a
-          echo Generating version %VERSION%
-          echo VERSION=%VERSION% >> $env:GITHUB_ENV
+          VERSION=$(git rev-list --count HEAD)
+          echo "Generating version $VERSION"
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
       - name: Build Exe
         run: flutter build windows
 
       - name: ZIP output
-        run: Compress-Archive -Path .\build\windows\x64\runner\Release\* -DestinationPath .\release.zip
+        run: powershell Compress-Archive -Path .\build\windows\x64\runner\Release\* -DestinationPath .\release.zip
 
       - name: Upload EXE
         uses: actions/upload-artifact@v4
